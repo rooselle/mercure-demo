@@ -1,14 +1,26 @@
-/*
- * Welcome to your app's main JavaScript file!
- *
- * We recommend including the built version of this JavaScript file
- * (and its CSS file) in your base layout (base.html.twig).
- */
+import Vue            from 'vue';
+import App            from './view/App.vue';
+import BootstrapVue   from 'bootstrap-vue';
+import Notifications  from 'vue-notification';
+import VueTimeago     from 'vue-timeago';
 
-// any CSS you require will output into a single css file (app.css in this case)
-require('../css/app.css');
+import '../css/app.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-// Need jQuery? Install it with "yarn add jquery", then uncomment to require it.
-// const $ = require('jquery');
+Vue.use(BootstrapVue);
+Vue.use(Notifications);
+Vue.use(VueTimeago, {
+  name: 'timeago',
+  locale: 'fr',
+  locales: {
+    fr: require('date-fns/locale/fr')
+  }
+});
 
-console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
+Vue.config.productionTip = false;
+
+new Vue({
+  el: '#app',
+  render: h => h(App),
+});

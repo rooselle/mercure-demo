@@ -1,0 +1,16 @@
+App\Entity\Pizza:
+    collectionOperations:
+        get:
+            normalization_context:
+                groups: ['pizza:read']
+        post:
+            denormalization_context:
+                groups: ['pizza:write']
+    itemOperations:
+        get:
+            normalization_context:
+                groups: ['pizza:read']
+        put:
+            denormalization_context:
+                groups: ['pizza:write']
+        delete: ~
