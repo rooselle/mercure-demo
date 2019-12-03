@@ -1,0 +1,6 @@
+#!/bin/sh
+
+eval "$(grep ^DB_CONTAINER_NAME= .docker/.env)"
+eval "$(grep ^DB_PORT= .docker/.env)"
+
+cd .docker && docker-compose run --rm dockerize -wait tcp://$DB_CONTAINER_NAME:$DB_PORT

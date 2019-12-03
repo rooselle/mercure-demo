@@ -1,0 +1,10 @@
+<form action="{{ path(action_path) }}" method="post">
+    <div class="field">
+        <label for="thing">Write something (or don't)</label>
+        <input class="input" id="thing" type="text" name="thing">
+    </div>
+    <button type="submit" class="button is-dark">
+        Send notification to {{ target }}
+    </button>
+    <p class="help">aka: {{ update_type }}</p>
+</form>

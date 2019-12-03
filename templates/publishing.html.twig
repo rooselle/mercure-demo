@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+<link rel="stylesheet" href="{{ asset('style.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="title">Publishing page</h1>
+    <p class="important-news">Feel free to send messages to whoever is subscribing to them</p>
+    <p class="help">Topic is : http://example.com/notification</p>
+    <div class="forms">
+        {% include '_form.html.twig' with {
+            'action_path': 'notify',
+            'target': 'All',
+            'update_type': 'Public update'
+        } %}
+
+        {% include '_form.html.twig' with {
+            'action_path': 'notify_user1',
+            'target': 'User 1',
+            'update_type': 'Private update to target : http://example.com/user/1'
+        } %}
+
+        {% include '_form.html.twig' with {
+            'action_path': 'notify_users',
+            'target': 'Users',
+            'update_type': 'Private update to target : http://example.com/group/users'
+        } %}
+
+        {% include '_form.html.twig' with {
+            'action_path': 'notify_admin',
+            'target': 'Admin',
+            'update_type': 'Private update to target : http://example.com/group/admin'
+        } %}
+
+        {% include '_form.html.twig' with {
+            'action_path': 'notify_user1_admin',
+            'target': 'User 1 & Admin',
+            'update_type': 'Private update to targets : http://example.com/user/1 & http://example.com/group/admin'
+        } %}
+    </div>
+</div>
+{% endblock %}

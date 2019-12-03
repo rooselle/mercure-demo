@@ -1,0 +1,24 @@
+#repository: git@gitlab.eolas.fr:project/project.git
+#
+#platforms:
+#    development:
+#        default_branch: dev
+#        max_releases: 2
+#        servers:
+#            dev-exemple-front-01:
+#                host: dev.exemple.com
+#                user: automate
+#                password: %dev_password%
+#                path: /home/wwwroot/
+#                port: 22
+#
+#shared_files:
+#    - '.env.local'
+#
+#on_deploy:
+#    - "composer install --prefer-dist"
+#    - "setfacl -R -m u:www-data:rwX -m u:`whoami`:rwX var"
+#    - "php bin/console c:c --env=prod --no-debug"
+#
+#post_deploy:
+#    - "php bin/console doctrine:schema:update --force"

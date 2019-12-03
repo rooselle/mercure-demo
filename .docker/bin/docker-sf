@@ -1,0 +1,3 @@
+#!/bin/sh
+
+./.docker/bin/docker-php "./bin/console $*"

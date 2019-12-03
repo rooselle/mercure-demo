@@ -1,0 +1,9 @@
+#!/bin/sh
+
+eval "$(grep ^APACHE_CONTAINER_NAME= .docker/.env)"
+
+if [ $# -eq 0 ]; then
+    docker exec -it $PHP_CONTAINER_NAME bash
+else
+    docker exec $APACHE_CONTAINER_NAME bash -c "$*"
+fi
