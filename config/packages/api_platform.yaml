@@ -1,0 +1,10 @@
+api_platform:
+    title: 'Pizza API'
+    description: 'An API that offers an amount of pizza data.'
+    show_webby: false
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity', '%kernel.project_dir%/config/api_platform']
+    patch_formats:
+        json: ['application/merge-patch+json']
+    swagger:
+        versions: [3]

@@ -1,4 +1,24 @@
 {
+    "api-platform/api-pack": {
+        "version": "v1.2.1"
+    },
+    "api-platform/core": {
+        "version": "2.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "2.5",
+            "ref": "a93061567140e386f107be75340ac2aee3f86cbf"
+        },
+        "files": [
+            "config/packages/api_platform.yaml",
+            "config/routes/api_platform.yaml",
+            "src/Entity/.gitignore"
+        ]
+    },
+    "behat/transliterator": {
+        "version": "v1.2.0"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -107,6 +127,9 @@
     },
     "fig/link-util": {
         "version": "1.0.0"
+    },
+    "gedmo/doctrine-extensions": {
+        "version": "v2.4.38"
     },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
@@ -583,6 +606,9 @@
     },
     "webmozart/assert": {
         "version": "1.6.0"
+    },
+    "willdurand/negotiation": {
+        "version": "v2.3.1"
     },
     "zendframework/zend-code": {
         "version": "3.4.0"

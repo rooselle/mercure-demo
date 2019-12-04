@@ -1,0 +1,10 @@
+App\Entity\Pizza:
+    attributes:
+        id:
+            groups: ['pizza:read']
+        name:
+            groups: ['pizza:read', 'pizza:write']
+        description:
+            groups: ['pizza:read', 'pizza:write']
+        updatedAt:
+            groups: ['pizza:read']

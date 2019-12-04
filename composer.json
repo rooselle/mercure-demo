@@ -9,6 +9,8 @@
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-json": "*",
+    "api-platform/api-pack": "^1.2",
+    "gedmo/doctrine-extensions": "^2.4",
     "nelmio/cors-bundle": "^1.5",
     "sensio/framework-extra-bundle": "^5.1",
     "symfony/asset": "4.3.*",
