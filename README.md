@@ -26,6 +26,10 @@ To put it simply, Mercure has a *hub* which is located at some url : in this pro
   * [Publish with the Mercure Component of Symfony](#publish-with-the-mercure-component-of-symfony)
   * [Publish with Guzzle](#publish-with-guzzle)
   * [Subscribe to topics](#subscribe-to-topics)
+* [Use the targets in Mercure](#use-the-targets-in-mercure)
+  * [What is a target ?](#what-is-a-target-)
+  * [Publish to targets](#publish-to-targets)
+  * [Subscribe as a target](#subscribe-as-a-target)
 
 ### Initialize a project
 Go [there](https://gitlab.eolas.fr/indus/symfony/website-skeleton) and clone on your marchine the skeleton which best suits your needs. (For this project I used the "current-mysql" branch, which at the time initialized a 4.3 Symfony project.)
@@ -126,7 +130,7 @@ public function update(PublisherInterface $publisher)
 
 What Symfony is actually doing : it makes an HTTP POST request to the hub of Mercure (which you have previously configured in your .env file), with `http://localhost/api/pizzas/2` as topic, and `json_encode($pizza)` (the modified and encoded pizza) as data.
 
-If you want to see a concrete example, go to the PublishingController of this project.
+If you want to see a concrete example, go to the PublishingController (in the *src/Controller* folder) of this project.
 
 #### Publish with Guzzle
 As said just before, Symfony just made an HTTP POST request to the hub of Mercure, it means anyone can make an HTTP POST request, even if they're not using the Mercure Component, and even if it's not a framework. To publish an update with Guzzle, copy/paste (and adapt) the below code.
@@ -137,7 +141,7 @@ As said just before, Symfony just made an HTTP POST request to the hub of Mercur
 use GuzzleHttp\Client;
 // ... 
 
-public function update()
+public function create()
 {
     $pizza = json_encode(new Pizza('Quatre fromages'));
 
@@ -200,3 +204,84 @@ A few explanations :
 A few more things to know :
 * (if you subscribe to a topic which was published via API Platform) when a resource is created or updated, API Platform publishes to the hub the data of this (new or updated) resource. When a resource is deleted, it only publishes the IRI of the deleted resource (for example : `{@id: "/api/pizzas/3"}`).
 * in this simple project, we only need to subscribe to one topic. If you wanted to subscribe to two (or more) topics at the same time, your subscription url could look like this : `${hubUrl}?topic=${document.location.origin}/api/pizzas/{id}&topic=${document.location.origin}/api/users/{id}`.
+
+### Use the targets in Mercure
+#### What is a target in Mercure ?
+A target in Mercure is... well, the target of a publication. A target is a URI which identifies a person or a group of persons. For examples, `http://localhost/users/1` or `http://localhost/group/admin` are targets, the one would identify someone who is a user with id 1, and the second would identify someone who belongs to the group "admin" (or who has the role "admin").
+
+#### Publish to targets
+To publish to a certain target, you just have to add an array of targets uri as a third parameter to the constructor of your Update object or, if you use Guzzle, add a third form parameter with key *"target"* and the uri of the target as value.
+
+```php
+public function create(PublisherInterface $publisher)
+{
+    $pizza = json_encode(new Pizza('Quatre fromages'));
+
+    $update = new Update(
+        'http://localhost/notification',
+        $pizza,
+        [
+            'http://localhost/users/1',
+            'http://localhost/group/admin'
+        ]
+    );
+    $publisher($update);
+
+    return $this->redirectToRoute('home');
+}
+```
+
+The code above means that anyone who is identified as `http://localhost/users/1` *or* `http://localhost/group/admin` (and who subscribe to the topic) will receive the publication. The client identified with the target `http://localhost/users/3` will *not* receive the publication, but the client identified with `http://localhost/group/admin` will, even if they're not identified with the target `http://localhost/users/1`.
+
+#### Subscribe as a target
+If the client bears not JWT to the hub of Mercure, it will only receive *public* updates. For them to receive *private* updates, they have to bear a JWT, whose payload is structured like this :
+```json
+{
+  "mercure": {
+    "subscribe": [
+        "http://localhost/users/1"
+    ]
+  }
+}
+```
+
+Notice the *subscribe* instead of the *publish* one (in the payload of the publisher's JWT). The array of targets (there can be one, or more) represents as *which* target the subscriber identifies : as which target they will subscribe to topics. This way, if a publication is made to a specific target as which they identify, they will receive it.
+
+If the client is a web browser, the JWT will be sent through a *mercureAuthorization* cookie, that will be set by the app through the *set-cookie* header of the response of the page where the client will subscribe to the hub of Mercure. (Otherwise, the JWT is sent in the *Authorization: Bearer <token>* header of the POST request.)
+
+```php
+public function displaySubscribingView()
+{
+    // payload jwt : mercure.subscribe = ["http://example.com/user/1", "http://example.com/group/users"]
+    $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJodHRwOi8vZXhhbXBsZS5jb20vdXNlci8xIiwiaHR0cDovL2V4YW1wbGUuY29tL2dyb3VwL3VzZXJzIl19fQ.0zbHD9ST7b-eaVjhGfCPNwzW0WXsEImmW0c1sZvWudQ';
+
+    $response = new Response();
+    $response->headers->set(
+        'set-cookie',
+        'mercureAuthorization='.$token.'; Path=/.well-known/mercure; secure; httponly; SameSite=strict'
+    );
+
+    return $this->render('subscribing.html.twig', null, $response);
+}
+```
+
+It is ***important*** to note that the cookie should be *secure* **only** if the connexion is secure (https, which is the best practice). If you test this on your test server which is not secure (http), remove the *secure* attribute of the cookie, otherwise the cookie will **not** be sent to the hub of mercure.
+
+You can (and it is strongly advised) that you set dynamically the JWT of the client, depending on the id of the authenticated user, for example. For that, you can refer to the [Mercure Component documentation](https://symfony.com/doc/current/mercure.html#authorization).
+
+On the client side, ***do not forget*** to set the *withCredentials* attribute of the EventSource at *true*, to tell your browser to send the cookie to the Mercure hub when it instantiates an EventSource.
+
+```javascript
+// script.js
+
+subscribe() {
+  const hubUrl = 'http://localhost:8003/.well-known/mercure';
+  const eventSource = new EventSource(`${hubUrl}?topic=http://localhost/api/pizzas/{id}`, {withCredentials: true});
+  eventSource.onmessage = event => {
+    const pizza = (JSON).parse(event.data);
+    console.log(pizza);
+  }
+}
+```
+
+If you want to see a concrete example, go to the SubscribingController.php (in the *src/Controller* folder) and the subscribing.html.twig (in *the *templates* folder) of this project.
