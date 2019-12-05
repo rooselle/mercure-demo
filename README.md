@@ -213,6 +213,8 @@ A target in Mercure is... well, the target of a publication. A target is a URI w
 To publish to a certain target, you just have to add an array of targets uri as a third parameter to the constructor of your Update object or, if you use Guzzle, add a third form parameter with key *"target"* and the uri of the target as value.
 
 ```php
+// App/Controller/PizzaController.php
+ 
 public function create(PublisherInterface $publisher)
 {
     $pizza = json_encode(new Pizza('Quatre fromages'));
@@ -252,6 +254,8 @@ Don't forget that the verify signature of this JWT must also be signed with the 
 If the client is a web browser, the JWT will be sent through a *mercureAuthorization* cookie, that will be set by the app through the *set-cookie* header of the response of the page where the client will subscribe to the hub of Mercure. (Otherwise, the JWT is sent in the *Authorization: Bearer <token>* header of the POST request.)
 
 ```php
+// App/Controller/SubscribingController.php
+
 public function displaySubscribingView()
 {
     // payload jwt : mercure.subscribe = ["http://example.com/user/1", "http://example.com/group/users"]
