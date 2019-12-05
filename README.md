@@ -68,7 +68,7 @@ Then, you need to generate a JWT token that your Symfony application must bear t
 ```
 This means that the Symfony app will only be authorized to publish public updates (ie. it won't be able to publish to private targets, but will see that later). Replace the empty array by `["*"]` to allow the app to publish to every target (public updates and updates to all private targets).
 
-Don't forget to set your private key in the "verify signature" panel of the jwt.io form. This key should be the same as the one you put in your docker-compose file.
+Don't forget to set your private key in the "verify signature" panel of the jwt.io form. This key should be the same as the one you put in your docker-compose file (or elsewhere depending on how you installed the hub).
 
 You can now set your environment variables :
 ```
@@ -246,6 +246,8 @@ If the client bears not JWT to the hub of Mercure, it will only receive *public*
 ```
 
 Notice the *subscribe* instead of the *publish* one (in the payload of the publisher's JWT). The array of targets (there can be one, or more) represents as *which* target the subscriber identifies : as which target they will subscribe to topics. This way, if a publication is made to a specific target as which they identify, they will receive it.
+
+Don't forget that the verify signature of this JWT must also be signed with the private key you put in your docker-compose file (or elsewhere depending on how you installed the hub).
 
 If the client is a web browser, the JWT will be sent through a *mercureAuthorization* cookie, that will be set by the app through the *set-cookie* header of the response of the page where the client will subscribe to the hub of Mercure. (Otherwise, the JWT is sent in the *Authorization: Bearer <token>* header of the POST request.)
 
