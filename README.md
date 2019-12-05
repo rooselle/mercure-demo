@@ -18,8 +18,14 @@ To put it simply, Mercure has a *hub* which is located at some url : in this pro
 ![mercure.rocks diagram of the process](https://mercure.rocks/static/main.png)
 
 ## Let's put this into practice
+* [Initialize a project](#initialize-a-project)
 * [Set up Mercure](#set-up-mercure)
 * [Use Mercure](#use-mercure)
+  * [Installation](#installation)
+  * [Publish with API Platform](#publish-with-api-platform)
+  * [Publish with the Mercure Component of Symfony](#publish-with-the-mercure-component-of-symfony)
+  * [Publish with Guzzle](#publish-with-guzzle)
+  * [Subscribe to topics](#subscribe-to-topics)
 
 ### Initialize a project
 Go [there](https://gitlab.eolas.fr/indus/symfony/website-skeleton) and clone on your marchine the skeleton which best suits your needs. (For this project I used the "current-mysql" branch, which at the time initialized a 4.3 Symfony project.)
@@ -45,7 +51,7 @@ It is very important to set properly the *CORS_ALLOWED_ORIGINS* attribute, other
 Install your project :
 ``make project-install``
 
-Install the Symfony plugin which implements Mercure :
+Install the Symfony Component which implements Mercure :
 ``composer require mercure``
 
 Then, you need to generate a JWT token that your Symfony application must bear to be able to *publish* updates to the Mercure Hub. Go to [jwt.io](https://jwt.io/#debugger-io?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.rQB2YPCYz8NX2V1k_a9G3E_AQ6i_1JidlOrOEhUtJaw). The payload should at least contain the following structure :  
@@ -87,23 +93,93 @@ npm install vue vue-loader vue-template-compiler
 ``
 (Check out the [Vue.js documentation](https://fr.vuejs.org/v2/guide/index.html) for more info on the setting up)
 
-#### API Platform does the publishing part
+#### Publish with API Platform
 Set up your entities and your front-end app. API Platform does almost all the work for you : you won't have to make any publishing ! For this to work, you have to tell API Platform that it should use Mercure. For that, the ApiResource annotation of your Entity should look like this : `@ApiResource(mercure=true)`.
 
 Now, let's take the example of this project. A user can create, edit, or delete pizzas. All of these crud operations make an api call to `/api/pizzas/{id}`, whether it's with the method POST, PUT, or DELETE. If we update the pizza whose id is 2, API Platform will publish to the hub with the following topic : `http://localhost/api/pizzas/2`. (Note that the first part of the topic url is the domain where your project is located.)
 
 So, if you want to know when the pizza 2 is updated, the url you should subscribe to on the client side is : `http://localhost:8003/hub?topic=http://localhost/api/pizzas/2`. *Yes, but I have a thousand pizzas in my database, and I want to add more...* Well, just subscribe to `http://localhost:8003/hub?topic=http://localhost/api/pizzas/{id}` and Mercure will dynamically change the id so that you subscribe in one time to the publications concerning *all* the pizzas.
 
-#### Subscribing to topics
-To subscribe to topics on your front-end app, it's as simple and as short as that :
+#### Publish with the Mercure Component of Symfony
+To publish an update without API Platform, but with the help of the Mercure Component of Symfony, put the below code (and adapt it, of course) in your controller.
+```php
+// App/Controller/PizzaController.php
+
+use Symfony\Component\Mercure\PublisherInterface;
+// ...
+
+public function update(PublisherInterface $publisher)
+    {
+        $pizza = $this->pizzaRepository->findById(2);
+        $pizza->setName("A new name");
+  
+        $update = new Update(
+            'http://localhost/api/pizzas/2',
+            json_encode($pizza)
+        );
+        
+        $publisher($update);
+
+        return $this->redirectToRoute('home');
+    }
+```
+
+What Symfony is actually doing : it makes an HTTP POST request to the hub of Mercure (which you have previously configured in your .env file), with `http://localhost/api/pizzas/2` as topic, and `json_encode($pizza)` (the modified and encoded pizza) as data.
+
+If you want to see a concrete example, go to the PublishingController of this project.
+
+#### Publish with Guzzle
+As said just before, Symfony just made an HTTP POST request to the hub of Mercure, it means anyone can make an HTTP POST request, even if they're not using the Mercure Component, and even if it's not a framework. To publish an update with Guzzle, copy/paste (and adapt) the below code.
+
+```php
+// MyClass.php
+
+use GuzzleHttp\Client;
+// ... 
+
+public function update()
+{
+    $pizza = json_encode(new Pizza('Quatre fromages'));
+
+    $client = new Client(['base_uri' => 'http://localhost:8003']);
+    $client->request('POST', '/.well-known/mercure', [
+        'headers' => [
+            'Authorization' => 'Bearer my.superlong.jwt',
+        ],
+        'form_params' => [
+            'topic' => 'http://localhost/api/pizzas/2',
+            'data' => $pizza
+        ]
+    ]);
+}
+```
+
+#### Subscribe to topics
+No matter how you publish updates, the subscribing part is the same. To subscribe to topics on your front-end app, it's as simple and as short as that :
+
+```javascript
+// script.js
+
+subscribe() {
+  const hubUrl = 'http://localhost:8003/.well-known/mercure';
+  const eventSource = new EventSource(`${hubUrl}?topic=http://localhost/api/pizzas/{id}`);
+  eventSource.onmessage = event => {
+    const pizza = (JSON).parse(event.data);
+    console.log(pizza);
+  }
+}
+```
+
+Actually, when you'll implement it on your project, you will do things a little differently. Indeed, the [specification](https://mercure.rocks/spec) of Mercure indicates that the hub url should be discoverable, which implies that on the client side, the hub url should be discovered rather than hard-coded. Thus you'll have to set a *Link* header with the hub url (`<http://localhost:8003/.well-known/mercure>; rel="mercure"`) in the response of a GET request when a resource is fetched. If you use API Platform, you don't have to do anything on your app, it sends the header for you.
+
 ```javascript
 // assets/js/view/Pizzas.vue
 
 getPizzas() {
-    HTTP_API
-      .get('/pizzas')
+    axios
+      .get('http://localhost/api/pizzas')
       .then(response => {
-        this.pizzas = response.data['hydra:member'];
+        this.pizzas = response.data;
         const hubUrl = response.headers.link.match(/<([^>]+)>;\s+rel=(?:mercure|"[^"]*mercure[^"]*")/)[1];
         const es = new EventSource(`${hubUrl}?topic=${document.location.origin}/api/pizzas/{id}`);
         es.onmessage = ({data}) => {
@@ -115,14 +191,12 @@ getPizzas() {
 ```
 
 A few explanations :
-* `hydra:member` is because the project accepts *ld+json* as response format (and API Platform sends response in this format), the pizzas are thus the value of the `hydra:member` attribute of the response data.
-* you *could* brutally copy/paste the subscription url we determined earlier, but then your code wouldn't be very reusable and could be the source of errors, and also you may not know the hub url if you're only in charge of developing the front-end. (*And* the specifications of Mercure suggests discovering the hub url, not hard-coding it.)
-* on each api call you make, Mercure sends a *Link* header on the response with the Hub url. The header looks like this : `<http://localhost:8003/.well-known/mercure>; rel="mercure"` and the RegEx in the code above extracts just the hub url, that is : `http://localhost:8003/.well-known/mercure`.
-* the `const es` is **how you can actually subscribe to a topic**. You instantiate an EventSource, which *opens a persistent connection to an HTTP server, which sends events in text/event-stream format. (...) Once the connection is opened, incoming messages from the server are delivered to your code in the form of events. ([MDN web docs](https://developer.mozilla.org/en-US/docs/Web/API/EventSource))* You give the EventSource the subscription url, which is made up of the hub url and the topic url.
-* as I said before, the topic url starts with your domain : to retrieve it, you look for the origin location of the document.
+* the RegEx in the code above (`/<([^>]+)>;\s+rel=(?:mercure|"[^"]*mercure[^"]*")/`) extracts (discovers) the hub url from the link header, that is : `http://localhost:8003/.well-known/mercure`.
+* the `const eventSource` is **how you can actually subscribe to a topic**. You instantiate an EventSource, which *opens a persistent connection to an HTTP server, which sends events in text/event-stream format. (...) Once the connection is opened, incoming messages from the server are delivered to your code in the form of events. ([MDN web docs](https://developer.mozilla.org/en-US/docs/Web/API/EventSource))* You give the EventSource the subscription url, which is made up of the hub url and the topic uri.
+* as I said before, the topic uri starts with your domain : so to retrieve it, you can look for the origin location of the document (`${document.location.origin}`).
 * you subscribe to the topic, but you don't do anything with what is published until you listen to it with the `onmessage` event handler. The parameter of the callback function allows you to retrieve the data that was published to the hub (the pizza that was updated, for example), which you then parse to deserialize it and be able to use it as an object.
 * ***And that's it !*** You do whatever you want with the data... you log it, you use it to update the data in your front-end app, you send a notification with info about the data you received... That's up to you. But whatever you do, everyone who is subscribing to the topic will know about it in real-time !
 
 A few more things to know :
-* When a resource is created or updated, API Platform publishes to the hub the data of this (new or updated) resource. When a resource is deleted, it only publishes the IRI of the deleted resource (for example : `{@id: "/api/pizzas/3"}`).
-* In this simple project, we only need to subscribe to one topic. If you wanted to subscribe to two (or more) topics at the same time, your subscription url could look like this : `${hubUrl}?topic=${document.location.origin}/api/pizzas/{id}&topic=${document.location.origin}/api/users/{id}`.
+* (if you subscribe to a topic which was published via API Platform) when a resource is created or updated, API Platform publishes to the hub the data of this (new or updated) resource. When a resource is deleted, it only publishes the IRI of the deleted resource (for example : `{@id: "/api/pizzas/3"}`).
+* in this simple project, we only need to subscribe to one topic. If you wanted to subscribe to two (or more) topics at the same time, your subscription url could look like this : `${hubUrl}?topic=${document.location.origin}/api/pizzas/{id}&topic=${document.location.origin}/api/users/{id}`.
