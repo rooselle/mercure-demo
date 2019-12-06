@@ -50,7 +50,7 @@ mercure:
   ports:
       - 8003:80
 ```
-It is very important to set properly the *CORS_ALLOWED_ORIGINS* attribute, otherwise the clients won't be able to send their authorization cookie to the Mercure hub.
+It is very important to set properly the `CORS_ALLOWED_ORIGINS` attribute, otherwise the clients won't be able to send their authorization cookie to the Mercure hub.
 
 (Run the two following commands if you've created a Symfony App.)
 
@@ -132,7 +132,7 @@ public function update(PublisherInterface $publisher)
 
 What Symfony is actually doing : it makes an HTTP POST request to the hub of Mercure (which you have previously configured in your .env file), with `http://localhost/api/pizzas/2` as topic, and `json_encode($pizza)` (the modified and encoded pizza) as data.
 
-If you want to see a concrete example, go to the PublishingController (in the *src/Controller* folder) of this project.
+If you want to see a concrete example, go to the `PublishingController.php` (in the *src/Controller* folder) of this project.
 
 #### Publish with Guzzle
 As said just before, Symfony just made an HTTP POST request to the hub of Mercure, it means anyone can make an HTTP POST request, even if they're not using the Mercure Component, and even if it's not a framework. To publish an update with Guzzle, copy/paste (and adapt) the below code.
@@ -176,7 +176,7 @@ subscribe() {
 }
 ```
 
-Actually, when you'll implement it on your project, you will do things a little differently. Indeed, the [specification](https://mercure.rocks/spec) of Mercure indicates that the hub URL should be discoverable, which implies that on the client side, the hub URL should be discovered rather than hard-coded. Thus you'll have to set a *Link* header with the hub URL (`<http://localhost:8003/.well-known/mercure>; rel="mercure"`) in the response of a GET request when a resource is fetched. If you use API Platform, you don't have to do anything on your app, it sends the header for you.
+Actually, when you'll implement it on your project, you will do things a little differently. Indeed, the [specification](https://mercure.rocks/spec) of Mercure indicates that the hub URL should be discoverable, which implies that on the client side, the hub URL should be discovered rather than hard-coded. Thus you'll have to set a `Link` header with the hub URL (`<http://localhost:8003/.well-known/mercure>; rel="mercure"`) in the response of a GET request when a resource is fetched. If you use API Platform, you don't have to do anything on your app, it sends the header for you.
 
 ```javascript
 // assets/js/view/Pizzas.vue
@@ -249,11 +249,11 @@ If the client bears not JWT to the hub of Mercure, it will only receive *public*
 }
 ```
 
-Notice the *subscribe* attribute instead of the *publish* one (in the payload of the publisher's JWT). The array of targets (there can be one, or more) represents as *which* target the subscriber identifies : as which target they will subscribe to topics. This way, if a publication is made to a specific target as which they identify, they will receive it.
+Notice the `subscribe` attribute instead of the `publish` one (in the payload of the publisher's JWT). The array of targets (there can be one, or more) represents as *which* target the subscriber identifies : as which target they will subscribe to topics. This way, if a publication is made to a specific target as which they identify, they will receive it.
 
 Don't forget that the verify signature of this JWT must also be signed with the private key you put in your docker-compose file (or elsewhere depending on how you installed the hub).
 
-If the client is a web browser, the JWT will be sent through a *mercureAuthorization* cookie, that will be set by the app through the *set-cookie* header of the response of the page where the client will subscribe to the hub of Mercure. (Otherwise, the JWT is sent in the *Authorization: Bearer <token>* header of the POST request.)
+If the client is a web browser, the JWT will be sent through a `mercureAuthorization` cookie, that will be set by the app through the `set-cookie` header of the response of the page where the client will subscribe to the hub of Mercure. (Otherwise, the JWT is sent in the `Authorization: Bearer <token>` header of the POST request.)
 
 ```php
 // App/Controller/SubscribingController.php
