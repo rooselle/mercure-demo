@@ -86,7 +86,6 @@ class SubscribingController extends AbstractController
             'set-cookie',
             'mercureAuthorization='.$token.'; Path=/.well-known/mercure; SameSite=strict'
         );
-        $response->sendHeaders();
 
         return $response;
     }
