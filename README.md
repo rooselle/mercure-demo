@@ -2,7 +2,7 @@
 `http://your-domain/` will display a Demo of the use of Mercure in a small Pizza App.  
 `http://your-domain/publish` & `http://your-domain/subscribe` will display a Demo of the use of targets in Mercure.
  
-# How to use Mercure in a Symfony & Vue.js App
+# How to use Mercure in a Web App
 
 > Mercure is a protocol allowing to push data updates to web browsers and other HTTP clients in a convenient, fast, reliable and battery-efficient way. It is especially useful to publish real-time updates of resources served through web APIs, to reactive web and mobile apps.
 >
@@ -32,7 +32,7 @@ To put it simply, Mercure has a *hub* which is located at some url : in this pro
   * [Subscribe as a target](#subscribe-as-a-target)
 
 ### Initialize a project
-Go [there](https://gitlab.eolas.fr/indus/symfony/website-skeleton) and clone on your marchine the skeleton which best suits your needs. (For this project I used the "current-mysql" branch, which at the time initialized a 4.3 Symfony project.)
+If you want to make a Symfony App, go [there](https://gitlab.eolas.fr/indus/symfony/website-skeleton) and clone on your marchine the skeleton which best suits your needs. (For this project I used the "current-mysql" branch, which at the time initialized a 4.3 Symfony project.)
 
 ### Set up Mercure
 Add the following code to your docker-compose :
@@ -52,13 +52,15 @@ mercure:
 ```
 It is very important to set properly the *CORS_ALLOWED_ORIGINS* attribute, otherwise the clients won't be able to send their authorization cookie to the Mercure hub.
 
+(Run the two following commands if you've created a Symfony App.)
+
 Install your project :
 ``make project-install``
 
 Install the Symfony Component which implements Mercure :
 ``composer require mercure``
 
-Then, you need to generate a JWT token that your Symfony application must bear to be able to *publish* updates to the Mercure Hub. Go to [jwt.io](https://jwt.io/#debugger-io?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.rQB2YPCYz8NX2V1k_a9G3E_AQ6i_1JidlOrOEhUtJaw). The payload should at least contain the following structure :  
+Then, you need to generate a JWT token that your application must bear to be able to *publish* updates to the Mercure Hub. Go to [jwt.io](https://jwt.io/#debugger-io?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.rQB2YPCYz8NX2V1k_a9G3E_AQ6i_1JidlOrOEhUtJaw). The payload should at least contain the following structure :  
 ```json
 {
   "mercure": {
@@ -66,11 +68,11 @@ Then, you need to generate a JWT token that your Symfony application must bear t
   }
 }
 ```
-This means that the Symfony app will only be authorized to publish public updates (ie. it won't be able to publish to private targets, but will see that later). Replace the empty array by `["*"]` to allow the app to publish to every target (public updates and updates to all private targets).
+This means that the app will only be authorized to publish public updates (ie. it won't be able to publish to private targets, but will see that later). Replace the empty array by `["*"]` to allow the app to publish to every target (public updates and updates to all private targets).
 
 Don't forget to set your private key in the "verify signature" panel of the jwt.io form. This key should be the same as the one you put in your docker-compose file (or elsewhere depending on how you installed the hub).
 
-You can now set your environment variables :
+You can now set your environment variables (if you're in a Symfony app) :
 ```
 MERCURE_PUBLISH_URL=http://localhost:8003/.well-known/mercure
 # put below the JWT token you've just generated
@@ -83,7 +85,7 @@ Now go to your hub address (`http://localhost:8003/.well-known/mercure`), if you
 You can use Mercure several ways : with or without API Plaftorm, with or without Vue.js, Vuex... and even with or without Symfony. This demo project (regarding the Pizza App) uses Symfony, API Platform, and Vue.js. As for the demo of the use of targets, it's Symfony only (but could easily be done without framework).
 
 #### Installation
-Now that you've cloned the skeleton and configured the Mercure hub, let's install API Platform and Vue.js.
+Now that you've installed your app and configured the Mercure hub, let's install API Platform and Vue.js (pass this step if you don't want to use them).
 
 Install API Platform :
 ``
@@ -174,7 +176,7 @@ subscribe() {
 }
 ```
 
-Actually, when you'll implement it on your project, you will do things a little differently. Indeed, the [specification](https://mercure.rocks/spec) of Mercure indicates that the hub url should be discoverable, which implies that on the client side, the hub url should be discovered rather than hard-coded. Thus you'll have to set a *Link* header with the hub url (`<http://localhost:8003/.well-known/mercure>; rel="mercure"`) in the response of a GET request when a resource is fetched. If you use API Platform, you don't have to do anything on your app, it sends the header for you.
+Actually, when you'll implement it on your project, you will do things a little differently. Indeed, the [specification](https://mercure.rocks/spec) of Mercure indicates that the hub URL should be discoverable, which implies that on the client side, the hub URL should be discovered rather than hard-coded. Thus you'll have to set a *Link* header with the hub URL (`<http://localhost:8003/.well-known/mercure>; rel="mercure"`) in the response of a GET request when a resource is fetched. If you use API Platform, you don't have to do anything on your app, it sends the header for you.
 
 ```javascript
 // assets/js/view/Pizzas.vue
@@ -195,22 +197,22 @@ getPizzas() {
 ```
 
 A few explanations :
-* the RegEx in the code above (`/<([^>]+)>;\s+rel=(?:mercure|"[^"]*mercure[^"]*")/`) extracts (discovers) the hub url from the link header, that is : `http://localhost:8003/.well-known/mercure`.
-* the `const eventSource` is **how you can actually subscribe to a topic**. You instantiate an EventSource, which *opens a persistent connection to an HTTP server, which sends events in text/event-stream format. (...) Once the connection is opened, incoming messages from the server are delivered to your code in the form of events. ([MDN web docs](https://developer.mozilla.org/en-US/docs/Web/API/EventSource))* You give the EventSource the subscription url, which is made up of the hub url and the topic uri.
-* as I said before, the topic uri starts with your domain : so to retrieve it, you can look for the origin location of the document (`${document.location.origin}`).
+* the RegEx in the code above (`/<([^>]+)>;\s+rel=(?:mercure|"[^"]*mercure[^"]*")/`) extracts (discovers) the hub URL from the link header, that is : `http://localhost:8003/.well-known/mercure`.
+* the `const eventSource` is **how you can actually subscribe to a topic**. You instantiate an EventSource, which *opens a persistent connection to an HTTP server, which sends events in text/event-stream format. (...) Once the connection is opened, incoming messages from the server are delivered to your code in the form of events. ([MDN web docs](https://developer.mozilla.org/en-US/docs/Web/API/EventSource))* You give the EventSource the subscription URI, which is made up of the hub URL and the topic URI.
+* as I said before, the topic URI starts with your domain : so to retrieve it, you can look for the origin location of the document (`${document.location.origin}`).
 * you subscribe to the topic, but you don't do anything with what is published until you listen to it with the `onmessage` event handler. The parameter of the callback function allows you to retrieve the data that was published to the hub (the pizza that was updated, for example), which you then parse to deserialize it and be able to use it as an object.
 * ***And that's it !*** You do whatever you want with the data... you log it, you use it to update the data in your front-end app, you send a notification with info about the data you received... That's up to you. But whatever you do, everyone who is subscribing to the topic will know about it in real-time !
 
 A few more things to know :
 * (if you subscribe to a topic which was published via API Platform) when a resource is created or updated, API Platform publishes to the hub the data of this (new or updated) resource. When a resource is deleted, it only publishes the IRI of the deleted resource (for example : `{@id: "/api/pizzas/3"}`).
-* in this simple project, we only need to subscribe to one topic. If you wanted to subscribe to two (or more) topics at the same time, your subscription url could look like this : `${hubUrl}?topic=${document.location.origin}/api/pizzas/{id}&topic=${document.location.origin}/api/users/{id}`.
+* in this simple project, we only need to subscribe to one topic. If you wanted to subscribe to two (or more) topics at the same time, your subscription URL could look like this : `${hubUrl}?topic=${document.location.origin}/api/pizzas/{id}&topic=${document.location.origin}/api/users/{id}`.
 
 ### Use the targets in Mercure
 #### What is a target in Mercure ?
-A target in Mercure is... well, the target of a publication. A target is a URI which identifies a person or a group of persons. For examples, `http://localhost/users/1` or `http://localhost/group/admin` are targets, the one would identify someone who is a user with id 1, and the second would identify someone who belongs to the group "admin" (or who has the role "admin").
+A target in Mercure is... well, the target of a publication. A target is a URI which identifies a person or a group of persons. For examples, `http://localhost/users/1` or `http://localhost/group/admin` are targets, the first one would identify someone who is a user with id 1, and the second would identify someone who belongs to the group "admin" (or who has the role "admin").
 
 #### Publish to targets
-To publish to a certain target, you just have to add an array of targets uri as a third parameter to the constructor of your Update object or, if you use Guzzle, add a third form parameter with key *"target"* and the uri of the target as value.
+To publish to a certain target, you just have to add an array of targets URI as a third parameter to the constructor of your Update object or, if you use Guzzle, add a third form parameter with key *"target"* and the URI of the target as value.
 
 ```php
 // App/Controller/PizzaController.php
@@ -233,7 +235,7 @@ public function create(PublisherInterface $publisher)
 }
 ```
 
-The code above means that anyone who is identified as `http://localhost/users/1` *or* `http://localhost/group/admin` (and who subscribe to the topic) will receive the publication. The client identified with the target `http://localhost/users/3` will *not* receive the publication, but the client identified with `http://localhost/group/admin` will, even if they're not identified with the target `http://localhost/users/1`.
+The code above means that anyone who is identified as `http://localhost/users/1` *or* `http://localhost/group/admin` (and who subscribed to the topic) will receive the publication. The client identified with the target `http://localhost/users/3` will *not* receive the publication, but the client identified with `http://localhost/group/admin` will, even if they're not identified with the target `http://localhost/users/1`.
 
 #### Subscribe as a target
 If the client bears not JWT to the hub of Mercure, it will only receive *public* updates. For them to receive *private* updates, they have to bear a JWT, whose payload is structured like this :
@@ -247,7 +249,7 @@ If the client bears not JWT to the hub of Mercure, it will only receive *public*
 }
 ```
 
-Notice the *subscribe* instead of the *publish* one (in the payload of the publisher's JWT). The array of targets (there can be one, or more) represents as *which* target the subscriber identifies : as which target they will subscribe to topics. This way, if a publication is made to a specific target as which they identify, they will receive it.
+Notice the *subscribe* attribute instead of the *publish* one (in the payload of the publisher's JWT). The array of targets (there can be one, or more) represents as *which* target the subscriber identifies : as which target they will subscribe to topics. This way, if a publication is made to a specific target as which they identify, they will receive it.
 
 Don't forget that the verify signature of this JWT must also be signed with the private key you put in your docker-compose file (or elsewhere depending on how you installed the hub).
 
@@ -271,11 +273,11 @@ public function displaySubscribingView()
 }
 ```
 
-It is ***important*** to note that the cookie should be *secure* **only** if the connexion is secure (https, which is the best practice). If you test this on your test server which is not secure (http), remove the *secure* attribute of the cookie, otherwise the cookie will **not** be sent to the hub of mercure.
+It is ***important*** to note that the cookie should be `secure` **only** if the connexion is secure (https, which is the best practice). If you test this on your test server which is not secure (http), remove the `secure` attribute of the cookie, otherwise the cookie will **not** be sent to the hub of mercure.
 
 You can (and it is strongly advised) that you set dynamically the JWT of the client, depending on the id of the authenticated user, for example. For that, you can refer to the [Mercure Component documentation](https://symfony.com/doc/current/mercure.html#authorization).
 
-On the client side, ***do not forget*** to set the *withCredentials* attribute of the EventSource at *true*, to tell your browser to send the cookie to the Mercure hub when it instantiates an EventSource.
+On the client side, ***do not forget*** to set the `withCredentials` attribute of the EventSource to `true`, to tell your browser to send the cookie to the Mercure hub when it instantiates an EventSource.
 
 ```javascript
 // script.js
@@ -290,4 +292,4 @@ subscribe() {
 }
 ```
 
-If you want to see a concrete example, go to the SubscribingController.php (in the *src/Controller* folder) and the subscribing.html.twig (in *the *templates* folder) of this project.
+If you want to see a concrete example, go to the `SubscribingController.php` (in the *src/Controller* folder) and the `subscribing.html.twig` (in the *templates* folder) of this project.
