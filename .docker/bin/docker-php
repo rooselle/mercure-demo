@@ -4,7 +4,7 @@ eval "$(grep ^PHP_CONTAINER_NAME= .docker/.env)"
 eval "$(grep ^PHP_ROOT_DIR= .docker/.env)"
 
 if [ $# -eq 0 ]; then
-    docker exec -it -u deveolas -w $PHP_ROOT_DIR $PHP_CONTAINER_NAME bash
+    docker exec -it -w $PHP_ROOT_DIR $PHP_CONTAINER_NAME bash
 else
-    docker exec -u deveolas -w $PHP_ROOT_DIR $PHP_CONTAINER_NAME bash -c "$*"
+    docker exec -w $PHP_ROOT_DIR $PHP_CONTAINER_NAME bash -c "$*"
 fi

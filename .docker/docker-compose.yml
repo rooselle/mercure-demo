@@ -2,12 +2,23 @@ version: '2'
 
 services:
     php:
-        image: registry-gitlab.eolas.fr/docker/php/7.2:fpm-smart
+        build: php
         container_name: $PHP_CONTAINER_NAME
         volumes:
             - ..:$PHP_ROOT_DIR
         ports:
             - 8008:8008
+        depends_on:
+            - rabbitmq
+            - php_consume
+
+    php_consume:
+        build: php_consume
+        container_name: $PHPCONSUME_CONTAINER_NAME
+        volumes:
+            - ..:$PHPCONSUME_ROOT_DIR
+        depends_on:
+            - rabbitmq
 
     apache:
         image: registry-gitlab.eolas.fr/docker/apache:2.4-base
@@ -29,6 +40,17 @@ services:
         container_name: $MAILDEV_CONTAINER_NAME
         ports:
             - 8001:80
+
+    rabbitmq:
+        image: rabbitmq:3.6-management
+        container_name: $RABBITMQ_CONTAINER_NAME
+        restart: always
+        ports:
+            - 8004:15672
+            - 8005:5672
+        environment:
+            - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+            - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
 
     db:
         image: registry-gitlab.eolas.fr/docker/mysql:10-base

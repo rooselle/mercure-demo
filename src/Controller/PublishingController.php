@@ -4,12 +4,20 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Mercure\PublisherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PublishingController extends AbstractController
 {
+    private $bus;
+
+    public function __construct(MessageBusInterface $bus)
+    {
+        $this->bus = $bus;
+    }
+
     /**
      * @Route("/publish", name="publish", methods={"GET"})
      */
@@ -23,11 +31,11 @@ class PublishingController extends AbstractController
      *
      * @return RedirectResponse
      */
-    public function notify(PublisherInterface $publisher)
+    public function notify(Request $request)
     {
-        $data = json_encode($_POST['thing']);
+        $data = json_encode($request->request->get('thing'));
 
-        $this->sendNotification($publisher, $data, []);
+        $this->sendNotification($data, []);
 
         return $this->redirectToRoute('publish');
     }
@@ -37,11 +45,11 @@ class PublishingController extends AbstractController
      *
      * @return RedirectResponse
      */
-    public function notifyUser1(PublisherInterface $publisher)
+    public function notifyUser1(Request $request)
     {
-        $data = json_encode($_POST['thing']);
+        $data = json_encode($request->request->get('thing'));
 
-        $this->sendNotification($publisher, $data, ['http://example.com/user/1']);
+        $this->sendNotification($data, ['http://example.com/user/1']);
 
         return $this->redirectToRoute('publish');
     }
@@ -51,11 +59,11 @@ class PublishingController extends AbstractController
      *
      * @return RedirectResponse
      */
-    public function notifyUsers(PublisherInterface $publisher)
+    public function notifyUsers(Request $request)
     {
-        $data = json_encode($_POST['thing']);
+        $data = json_encode($request->request->get('thing'));
 
-        $this->sendNotification($publisher, $data, ['http://example.com/group/users']);
+        $this->sendNotification($data, ['http://example.com/group/users']);
 
         return $this->redirectToRoute('publish');
     }
@@ -65,11 +73,11 @@ class PublishingController extends AbstractController
      *
      * @return RedirectResponse
      */
-    public function notifyAdmin(PublisherInterface $publisher)
+    public function notifyAdmin(Request $request)
     {
-        $data = json_encode($_POST['thing']);
+        $data = json_encode($request->request->get('thing'));
 
-        $this->sendNotification($publisher, $data, ['http://example.com/group/admin']);
+        $this->sendNotification($data, ['http://example.com/group/admin']);
 
         return $this->redirectToRoute('publish');
     }
@@ -79,11 +87,11 @@ class PublishingController extends AbstractController
      *
      * @return RedirectResponse
      */
-    public function notifyUser1Admin(PublisherInterface $publisher)
+    public function notifyUser1Admin(Request $request)
     {
-        $data = json_encode($_POST['thing']);
+        $data = json_encode($request->request->get('thing'));
 
-        $this->sendNotification($publisher, $data, ['http://example.com/user/1', 'http://example.com/group/admin']);
+        $this->sendNotification($data, ['http://example.com/user/1', 'http://example.com/group/admin']);
 
         return $this->redirectToRoute('publish');
     }
@@ -91,7 +99,7 @@ class PublishingController extends AbstractController
     /**
      * Creates the update and publishes it.
      */
-    private function sendNotification(PublisherInterface $publisher, string $data, array $targets)
+    private function sendNotification(string $data, array $targets)
     {
         $update = new Update(
             'http://example.com/notification',
@@ -99,6 +107,6 @@ class PublishingController extends AbstractController
             $targets
         );
 
-        $publisher($update);
+        $this->bus->dispatch($update);
     }
 }
