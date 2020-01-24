@@ -21,4 +21,4 @@ RUN apt-get update && apt-get install -y librabbitmq-dev libssh-dev \
     && docker-php-ext-enable amqp
 
 WORKDIR /home/wwwroot/mercure-demo
-ENTRYPOINT ["php", "/home/wwwroot/mercure-demo/bin/console", "messenger:consume", "amqp_async"]
+ENTRYPOINT ["php", "/var/www/html/mercure-demo/bin/console", "messenger:consume", "amqp_async"]

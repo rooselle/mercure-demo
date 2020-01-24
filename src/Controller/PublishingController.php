@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mercure\Publisher;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -31,11 +32,11 @@ class PublishingController extends AbstractController
      *
      * @return RedirectResponse
      */
-    public function notify(Request $request)
+    public function notify(Request $request, Publisher $publisher)
     {
         $data = json_encode($request->request->get('thing'));
 
-        $this->sendNotification($data, []);
+        $this->sendNotification($data, [], $publisher);
 
         return $this->redirectToRoute('publish');
     }
@@ -99,7 +100,7 @@ class PublishingController extends AbstractController
     /**
      * Creates the update and publishes it.
      */
-    private function sendNotification(string $data, array $targets)
+    private function sendNotification(string $data, array $targets, Publisher $publisher)
     {
         $update = new Update(
             'http://example.com/notification',
@@ -107,6 +108,7 @@ class PublishingController extends AbstractController
             $targets
         );
 
-        $this->bus->dispatch($update);
+//        $this->bus->dispatch($update);
+        $publisher($update);
     }
 }
