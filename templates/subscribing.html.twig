@@ -27,7 +27,7 @@
 {% if target is defined %}
     {% block javascripts %}
         <script>
-          const eventSource = new EventSource('http://chloe-briquet.docker.eolas.lan:8003/.well-known/mercure?topic=http://example.com/notification', {withCredentials: true});
+          const eventSource = new EventSource('http://localhost:8003/.well-known/mercure?topic=http://example.com/notification', {withCredentials: true});
           eventSource.onmessage = event => {
             document.querySelector('.important-news').insertAdjacentHTML('afterend', `<div class="notification is-success">${JSON.parse(event.data)}</div>`);
           }
