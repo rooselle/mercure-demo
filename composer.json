@@ -13,7 +13,7 @@
     "gedmo/doctrine-extensions": "^2.4",
     "nelmio/cors-bundle": "^1.5",
     "sensio/framework-extra-bundle": "^5.1",
-    "symfony/asset": "4.3.*",
+    "symfony/asset": "5.0.*",
     "symfony/console": "*",
     "symfony/dotenv": "*",
     "symfony/expression-language": "*",
@@ -23,7 +23,7 @@
     "symfony/http-client": "*",
     "symfony/intl": "*",
     "symfony/mercure-bundle": "^0.2.3",
-    "symfony/messenger": "4.3.*",
+    "symfony/messenger": "5.0.*",
     "symfony/monolog-bundle": "^3.1",
     "symfony/orm-pack": "*",
     "symfony/process": "*",
@@ -31,7 +31,7 @@
     "symfony/serializer-pack": "*",
     "symfony/swiftmailer-bundle": "^3.1",
     "symfony/translation": "*",
-    "symfony/twig-bundle": "*",
+    "symfony/twig-pack": "*",
     "symfony/validator": "*",
     "symfony/web-link": "*",
     "symfony/webpack-encore-bundle": "^1.7",
@@ -91,7 +91,7 @@
   "extra": {
     "symfony": {
       "allow-contrib": false,
-      "require": "4.3.*"
+      "require": "5.0.*"
     }
   }
 }
