@@ -5,13 +5,15 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class Controller extends AbstractController
+class PizzaController extends AbstractController
 {
     /**
-     * @Route("/", name="home", methods={"GET"})
+     * @Route("/", name="pizza")
      */
     public function index()
     {
-        return $this->render('index.html.twig');
+        return $this->render('pizza/index.html.twig', [
+            'controller_name' => 'PizzaController',
+        ]);
     }
 }

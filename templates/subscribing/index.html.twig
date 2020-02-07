@@ -1,8 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}
-    Subscribing page
-{% endblock %}
+{% block title %}Subscribing page{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
@@ -24,13 +22,13 @@
     </div>
 {% endblock %}
 
-{% if target is defined %}
-    {% block javascripts %}
+{% block javascripts %}
+    {% if target is defined %}
         <script>
-          const eventSource = new EventSource('http://localhost:8003/.well-known/mercure?topic=http://example.com/notification', {withCredentials: true});
-          eventSource.onmessage = event => {
-            document.querySelector('.important-news').insertAdjacentHTML('afterend', `<div class="notification is-success">${JSON.parse(event.data)}</div>`);
-          }
+            const eventSource = new EventSource('http://localhost:3000/.well-known/mercure?topic=http://example.com/notification', {withCredentials: true});
+            eventSource.onmessage = event => {
+                document.querySelector('.important-news').insertAdjacentHTML('afterend', `<div class="notification is-success">${JSON.parse(event.data)}</div>`);
+            }
         </script>
-    {% endblock %}
-{% endif %}
+    {% endif %}
+{% endblock %}
