@@ -1,8 +1,7 @@
 DOCKER_DIR            = .docker
-DOCKER_COMPOSE        = cd $(DOCKER_DIR) && docker-compose
+DOCKER_COMPOSE        = docker-compose
 
 EXEC_PHP_CONTAINER    = ${DOCKER_DIR}/bin/docker-php
-EXEC_APACHE_CONTAINER = ${DOCKER_DIR}/bin/docker-apache
 ECHO                  = ${DOCKER_DIR}/bin/display-job-title
 
 NPM                   = $(EXEC_PHP_CONTAINER) npm
@@ -50,15 +49,15 @@ npm: ## Update npm packages
 	$(ECHO) "Installing npm"
 	$(NPM) install
 
-assets-watch: node_modules ## Watch the assets and build their development version on file change
+assets-watch: ## Watch the assets and build their development version on file change
 	$(ECHO) "Watching assets changes"
 	$(NPM) run watch
 
-assets-dev: node_modules ## Build the development version of the assets
+assets-dev: ## Build the development version of the assets
 	$(ECHO) "Building dev assets"
 	$(NPM) run dev
 
-assets-prod: node_modules ## Build the production version of the assets
+assets-prod: ## Build the production version of the assets
 	$(ECHO) "Building prod assets"
 	$(NPM) run build
 
@@ -77,7 +76,7 @@ tests: ## Run unit tests
 
 symfony-security: ## Check security of your dependencies (https://security.sensiolabs.org/)
 	$(ECHO) "Checking Symfony vendor security"
-	$(EXEC_PHP_CONTAINER) ./bin/console security:check
+	$(SYMFONY) security:check
 
 ##
 ## Debug
@@ -86,11 +85,11 @@ symfony-security: ## Check security of your dependencies (https://security.sensi
 
 apache-error-log: ## Display the last entries from Apache error log
 	$(ECHO) "Displaying in real time last entries from Apache error log" "Use CTRL+C to close the process"
-	$(EXEC_APACHE_CONTAINER) tail -f /var/log/apache2/error.log
+	$(EXEC_PHP_CONTAINER) tail -f /var/log/apache2/error.log
 
 apache-access-log: ## Display the last entries from Apache access log
 	$(ECHO) "Displaying last entries from Apache access log" "Use CTRL+C to close the process"
-	$(EXEC_APACHE_CONTAINER) tail -f /var/log/apache2/access.log
+	$(EXEC_PHP_CONTAINER) tail -f /var/log/apache2/access.log
 
 ##
 #
@@ -111,14 +110,9 @@ docker-kill:
 	$(DOCKER_COMPOSE) kill
 	$(DOCKER_COMPOSE) down --volumes --remove-orphans
 
-download-php-cs-fixer:
-	$(ECHO) "Downloading php-cs-fixer"
-	$(EXEC_PHP_CONTAINER) curl -L http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
-
 php-cs-fixer:
 	$(ECHO) "Downloading php-cs-fixer"
-	$(EXEC) curl -L http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
-	$(EXEC) touch $@
+	$(EXEC_PHP_CONTAINER) curl -L http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
 
 wait-for-db:
 	$(ECHO) "Waiting for db"

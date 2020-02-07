@@ -46,3 +46,7 @@ services:
             CORS_ALLOWED_ORIGINS: http://localhost
         ports:
             - 3000:80
+
+    dockerize:
+        image: jwilder/dockerize
+        container_name: dockerize
