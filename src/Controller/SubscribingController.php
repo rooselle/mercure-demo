@@ -9,11 +9,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class SubscribingController extends AbstractController
 {
     /**
-     * @Route("/subscribe", name="subscribe", methods={"GET"})
+     * @Route("/subscribing", name="subscribing")
      */
-    public function subscribe()
+    public function index()
     {
-        return $this->render('subscribing.html.twig');
+        return $this->render('subscribing/index.html.twig', [
+            'controller_name' => 'SubscribingController',
+        ]);
     }
 
     /**
@@ -25,7 +27,7 @@ class SubscribingController extends AbstractController
         $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6W119fQ.LWYef6XLa-Bp8mDxs8p3O-IBwcpfMejU09zQPKpuPL0';
         $response = $this->getResponse($token);
 
-        return $this->render('subscribing.html.twig', ['target' => 'Anonymous'], $response);
+        return $this->render('subscribing/index.html.twig', ['target' => 'Anonymous'], $response);
     }
 
     /**
@@ -37,7 +39,7 @@ class SubscribingController extends AbstractController
         $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJodHRwOi8vZXhhbXBsZS5jb20vdXNlci8xIiwiaHR0cDovL2V4YW1wbGUuY29tL2dyb3VwL3VzZXJzIl19fQ.0zbHD9ST7b-eaVjhGfCPNwzW0WXsEImmW0c1sZvWudQ';
         $response = $this->getResponse($token);
 
-        return $this->render('subscribing.html.twig', ['target' => 'User 1'], $response);
+        return $this->render('subscribing/index.html.twig', ['target' => 'User 1'], $response);
     }
 
     /**
@@ -49,7 +51,7 @@ class SubscribingController extends AbstractController
         $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJodHRwOi8vZXhhbXBsZS5jb20vdXNlci8yIiwiaHR0cDovL2V4YW1wbGUuY29tL2dyb3VwL3VzZXJzIl19fQ.tT7jUsiVe9a1ssVbl6mVB3r-BUd11zJa1Zmo5Q8xEco';
         $response = $this->getResponse($token);
 
-        return $this->render('subscribing.html.twig', ['target' => 'User 2'], $response);
+        return $this->render('subscribing/index.html.twig', ['target' => 'User 2'], $response);
     }
 
     /**
@@ -61,7 +63,7 @@ class SubscribingController extends AbstractController
         $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJodHRwOi8vZXhhbXBsZS5jb20vYWRtaW4vMSIsImh0dHA6Ly9leGFtcGxlLmNvbS9ncm91cC9hZG1pbiJdfX0.FKViEQtCPsGmwXr8mzNAl-dzqrSw7KTCMxMhi0dfgYQ';
         $response = $this->getResponse($token);
 
-        return $this->render('subscribing.html.twig', ['target' => 'Admin 1'], $response);
+        return $this->render('subscribing/index.html.twig', ['target' => 'Admin 1'], $response);
     }
 
     /**
@@ -73,7 +75,7 @@ class SubscribingController extends AbstractController
         $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJodHRwOi8vZXhhbXBsZS5jb20vYWRtaW4vMiIsImh0dHA6Ly9leGFtcGxlLmNvbS9ncm91cC9hZG1pbiJdfX0.MCKtGmj9A-Fx4BCDURqDH5NoubHGCiaIp9ONMYdRSxU';
         $response = $this->getResponse($token);
 
-        return $this->render('subscribing.html.twig', ['target' => 'Admin 2'], $response);
+        return $this->render('subscribing/index.html.twig', ['target' => 'Admin 2'], $response);
     }
 
     /**

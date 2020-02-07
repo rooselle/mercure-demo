@@ -5,25 +5,25 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Mercure\Update;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PublishingController extends AbstractController
 {
-    private $bus;
+    private $publisher;
 
-    public function __construct(MessageBusInterface $bus)
+    public function __construct(PublisherInterface $publisher)
     {
-        $this->bus = $bus;
+        $this->publisher = $publisher;
     }
 
     /**
-     * @Route("/publish", name="publish", methods={"GET"})
+     * @Route("/publishing", name="publishing")
      */
     public function index()
     {
-        return $this->render('publishing.html.twig');
+        return $this->render('publishing/index.html.twig');
     }
 
     /**
@@ -37,7 +37,7 @@ class PublishingController extends AbstractController
 
         $this->sendNotification($data, []);
 
-        return $this->redirectToRoute('publish');
+        return $this->redirectToRoute('publishing');
     }
 
     /**
@@ -51,7 +51,7 @@ class PublishingController extends AbstractController
 
         $this->sendNotification($data, ['http://example.com/user/1']);
 
-        return $this->redirectToRoute('publish');
+        return $this->redirectToRoute('publishing');
     }
 
     /**
@@ -65,7 +65,7 @@ class PublishingController extends AbstractController
 
         $this->sendNotification($data, ['http://example.com/group/users']);
 
-        return $this->redirectToRoute('publish');
+        return $this->redirectToRoute('publishing');
     }
 
     /**
@@ -79,7 +79,7 @@ class PublishingController extends AbstractController
 
         $this->sendNotification($data, ['http://example.com/group/admin']);
 
-        return $this->redirectToRoute('publish');
+        return $this->redirectToRoute('publishing');
     }
 
     /**
@@ -93,7 +93,7 @@ class PublishingController extends AbstractController
 
         $this->sendNotification($data, ['http://example.com/user/1', 'http://example.com/group/admin']);
 
-        return $this->redirectToRoute('publish');
+        return $this->redirectToRoute('publishing');
     }
 
     /**
@@ -107,6 +107,6 @@ class PublishingController extends AbstractController
             $targets
         );
 
-        $this->bus->dispatch($update);
+        $this->publisher->__invoke($update);
     }
 }
