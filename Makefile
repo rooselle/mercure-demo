@@ -83,6 +83,10 @@ symfony-security: ## Check security of your dependencies (https://security.sensi
 ## -----
 ##
 
+cache-clear: ## Clear the cache of the application
+	$(ECHO) "Clearing the cache of the application"
+	$(SYMFONY) cache:clear
+
 apache-error-log: ## Display the last entries from Apache error log
 	$(ECHO) "Displaying in real time last entries from Apache error log" "Use CTRL+C to close the process"
 	$(EXEC_PHP_CONTAINER) tail -f /var/log/apache2/error.log
