@@ -2,51 +2,69 @@
 
 {% block title %}Publishing page{% endblock %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-    <link rel="stylesheet" href="{{ asset('style.css') }}">
-{% endblock %}
-
-
 {% block body %}
     <div class="container">
         <h1 class="title">Publishing page</h1>
-        <p class="important-news">Feel free to send messages to whoever is subscribing to them</p>
-        <p class="help">Topic is : http://example.com/notification</p>
-        <div class="forms">
+        <p >Feel free to send messages to whoever is subscribing to them.</p>
+        <p>
+            <a href="{{ path('subscribing') }}" title="Subscribing page">Click here</a> to access the subscribing page and see who is subscribing to which topic.
+        </p>
+        <p>
+            Send a notification about :
+        </p>
+        <div class="forms row">
             {% include 'publishing/_form.html.twig' with {
-                'id': 1,
-                'action_path': 'notify',
-                'target': 'All',
-                'update_type': 'Public update'
+                'action_path': 'notify_promotion',
+                'topic_name': 'A promotion on the website',
+                'topic_uri': 'http://example.com/promotion'
             } %}
 
             {% include 'publishing/_form.html.twig' with {
-                'id': 2,
-                'action_path': 'notify_user1',
-                'target': 'User 1',
-                'update_type': 'Private update to target : http://example.com/user/1'
+                'action_path': 'notify_website_update',
+                'topic_name': 'An update of the website',
+                'topic_uri': 'http://example.com/website/update'
             } %}
 
             {% include 'publishing/_form.html.twig' with {
-                'id': 3,
-                'action_path': 'notify_users',
-                'target': 'Users',
-                'update_type': 'Private update to target : http://example.com/group/users'
+                'action_path': 'notify_user_1_friend_request',
+                'topic_name': 'A new friend request to User 1',
+                'topic_uri': 'http://example.com/user/1/friend-request'
             } %}
 
             {% include 'publishing/_form.html.twig' with {
-                'id': 4,
-                'action_path': 'notify_admin',
-                'target': 'Admin',
-                'update_type': 'Private update to target : http://example.com/group/admin'
+                'action_path': 'notify_pasta_creation',
+                'topic_name': 'A pasta dish that was just created',
+                'topic_uri': 'http://example.com/pasta/creation'
             } %}
 
             {% include 'publishing/_form.html.twig' with {
-                'id': 5,
-                'action_path': 'notify_user1_admin',
-                'target': 'User 1 & Admin',
-                'update_type': 'Private update to targets : http://example.com/user/1 & http://example.com/group/admin'
+                'action_path': 'notify_pasta_deletion',
+                'topic_name': 'A pasta dish that was just deleted',
+                'topic_uri': 'http://example.com/pasta/deletion'
+            } %}
+
+            {% include 'publishing/_form.html.twig' with {
+                'action_path': 'notify_pizza_creation',
+                'topic_name': 'A pizza that was just created',
+                'topic_uri': 'http://example.com/pizza/creation'
+            } %}
+
+            {% include 'publishing/_form.html.twig' with {
+                'action_path': 'notify_pizza_deletion',
+                'topic_name': 'A pasta dish that was just deleted',
+                'topic_uri': 'http://example.com/pizza/deletion'
+            } %}
+
+            {% include 'publishing/_form.html.twig' with {
+                'action_path': 'notify_comment_moderation',
+                'topic_name': 'A comment that needs moderation',
+                'topic_uri': 'http://example.com/comment/moderation'
+            } %}
+
+            {% include 'publishing/_form.html.twig' with {
+                'action_path': 'notify_new_question',
+                'topic_name': 'A new question that needs answering',
+                'topic_uri': 'http://example.com/new-question'
             } %}
         </div>
     </div>
