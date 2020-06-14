@@ -1,4 +1,4 @@
-FROM lavoweb/php-7.3:latest
+FROM lavoweb/php-7.4:latest
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

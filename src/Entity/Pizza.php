@@ -19,49 +19,37 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Pizza
 {
     /**
-     * @var int the id of the pizza
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
-     * @var string the name of the pizza
-     *
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank
      */
-    private $name;
+    private string $name;
 
     /**
-     * @var string the description of the pizza
-     *
      * @ORM\Column(type="text", nullable=true)
      */
-    private $description;
+    private ?string $description;
 
     /**
-     * @var DateTime the date when the pizza was created
-     *
      * @ORM\Column(type="datetime")
      */
-    private $createdAt;
+    private DateTimeInterface $createdAt;
 
     /**
-     * @var DateTime the date when the pizza was last updated
-     *
      * @ORM\Column(type="datetime")
      */
-    private $updatedAt;
+    private DateTimeInterface $updatedAt;
 
     /**
-     * @var DateTime the date when the pizza was deleted
-     *
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $deletedAt;
+    private ?DateTimeInterface $deletedAt;
 
     public function getId(): ?int
     {

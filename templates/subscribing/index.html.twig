@@ -2,32 +2,82 @@
 
 {% block title %}Subscribing page{% endblock %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-    <link rel="stylesheet" href="{{ asset('style.css') }}">
-{% endblock %}
-
 {% block body %}
     <div class="container">
-        <h1 class="title">Subscribing page</h1>
-        {% if target is defined %}
-            <p class="important-news">Hey <strong>{{ target }}</strong>, notification is on the way</p>
-        {% else %}
-            <a class="button is-link" href="{{ path('subscribe_anonymous') }}">Subscribe as Anonymous</a>
-            <a class="button is-link" href="{{ path('subscribe_user1') }}">Subscribe as User 1</a>
-            <a class="button is-link" href="{{ path('subscribe_user2') }}">Subscribe as User 2</a>
-            <a class="button is-link" href="{{ path('subscribe_admin1') }}">Subscribe as Admin 1</a>
-            <a class="button is-link" href="{{ path('subscribe_admin2') }}">Subscribe as Admin 2</a>
+        <h1>Subscribing page</h1>
+        {% if person is defined %}
+            <p>
+                <a href="{{ path('subscribing') }}" class="btn btn-light">Back to the list</a>
+            </p>
+            <p>Hey <strong>{{ person }}</strong>, notification is on the way!</p>
+        {% endif %}
+
+        {% if person is not defined or 'Anonymous' == person %}
+            <p>
+                {% if person is not defined %}
+                    <a class="btn btn-primary" href="{{ path('subscribe_anonymous') }}">Subscribe as Anonymous</a>
+                {% endif %}
+                Anonymous receives only Updates that are <strong>public</strong>.
+            </p>
+        {% endif %}
+
+        {% if person is not defined %}
+            <p>Following person(s) receive(s) all <strong>public</strong> Updates as well as <strong>private</strong> ones :</p>
+        {% endif %}
+
+        {% if person is not defined or 'User 1' == person %}
+            <p>
+                {% if person is not defined %}
+                    <a class="btn btn-primary" href="{{ path('subscribe_user1') }}">Subscribe as User 1</a>
+                {% endif %}
+                User 1 is subscribing to the following topics : Website Update, Pizza (creation), Friend Request (made to them)
+            </p>
+        {% endif %}
+
+        {% if person is not defined or 'User 2' == person %}
+            <p>
+                {% if person is not defined %}
+                    <a class="btn btn-primary" href="{{ path('subscribe_user2') }}">Subscribe as User 2</a>
+                {% endif %}
+                User 2 is subscribing to the following topics : Website Update, All types of food (creation), Friend Request (made to them)
+            </p>
+        {% endif %}
+
+        {% if person is not defined or 'Admin 1' == person %}
+            <p>
+                {% if person is not defined %}
+                    <a class="btn btn-primary" href="{{ path('subscribe_admin1') }}">Subscribe as Admin 1</a>
+                {% endif %}
+                Admin 1 is subscribing to the following topics : All types of food (all actions), Comment Moderation
+            </p>
+        {% endif %}
+
+        {% if person is not defined or 'Admin 2' == person %}
+            <p>
+                {% if person is not defined %}
+                    <a class="btn btn-primary" href="{{ path('subscribe_admin2') }}">Subscribe as Admin 2</a>
+                {% endif %}
+                Admin 2 is subscribing to the following topics : All types of food (all actions), Questions that need an answer
+            </p>
+        {% endif %}
+
+        {% if person is defined %}
+            <div class="important-news"></div>
         {% endif %}
     </div>
 {% endblock %}
 
 {% block javascripts %}
-    {% if target is defined %}
+    {% if person is defined %}
         <script>
-            const eventSource = new EventSource('http://localhost:3000/.well-known/mercure?topic=http://example.com/notification', {withCredentials: true});
+            const url = new URL('http://localhost:3000/.well-known/mercure');
+            url.searchParams.append('topic', 'http://example.com/{notification}');
+            url.searchParams.append('topic', 'http://example.com/{type}/{action}');
+            url.searchParams.append('topic', 'http://example.com/user/{id}/{action}');
+
+            const eventSource = new EventSource(url.toString(), {withCredentials: true});
             eventSource.onmessage = event => {
-                document.querySelector('.important-news').insertAdjacentHTML('afterend', `<div class="notification is-success">${JSON.parse(event.data)}</div>`);
+                document.querySelector('.important-news').insertAdjacentHTML('afterend', `<div class="alert alert-success">${event.data}</div>`);
             }
         </script>
     {% endif %}

@@ -30,3 +30,7 @@
 .card-body .custom-checkbox {
     display: inline-block;
 }
+
+.card-body.notify {
+    text-align: center;
+}
