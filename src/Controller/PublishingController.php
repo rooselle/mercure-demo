@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Mercure\Update;
@@ -137,6 +136,9 @@ class PublishingController extends AbstractController
         return $this->redirectToRoute(static::ROUTE_PUBLISHING);
     }
 
+    /**
+     * @param array<string> $topics
+     */
     private function sendNotification(array $topics, string $data, bool $private = false): void
     {
         $update = new Update(

@@ -8,6 +8,13 @@ NPM                   = $(EXEC_PHP_CONTAINER) npm
 SYMFONY               = $(EXEC_PHP_CONTAINER) bin/console
 
 ##
+## Container
+## ----
+##
+php:
+	$(EXEC_PHP_CONTAINER) $(filter-out $@,$(MAKECMDGOALS))
+
+##
 ## Environment
 ## -----------
 ##
@@ -70,13 +77,11 @@ cs-fixer: php-cs-fixer ## Apply php-cs-fixer
 	$(ECHO) "Running php-cs-fixer"
 	$(EXEC_PHP_CONTAINER) php php-cs-fixer fix --config=.php_cs.dist -v --using-cache=no
 
-tests: ## Run unit tests
-	$(ECHO) "Running tests"
-	$(EXEC_PHP_CONTAINER) bin/phpunit
+phpstan: ## Run phpstan
+	$(ECHO) "Running phpstan"
+	$(EXEC_PHP_CONTAINER) vendor/bin/phpstan analyse
 
-symfony-security: ## Check security of your dependencies (https://security.sensiolabs.org/)
-	$(ECHO) "Checking Symfony vendor security"
-	$(SYMFONY) security:check
+quality: cs-fixer phpstan ## Shortcut for make php-cs-fixer and make phpstan
 
 ##
 ## Debug

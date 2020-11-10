@@ -1,9 +1,9 @@
 # Mercure Demo Project
 If you just want to run this project, clone it and run `make project-install` in a terminal.
 
-`http://your-domain/` will display a Demo of the use of Mercure in a small Pizza App.  
+`http://your-domain/` will display a Demo of the use of Mercure in a small Pizza App.
 `http://your-domain/publishing` & `http://your-domain/subscribing` will display a Demo of the use of topics and private updates in Mercure.
- 
+
 # How to use Mercure in a Web App
 
 > Mercure is an open protocol for real-time communications designed to be fast, reliable and battery-efficient. It is a modern and convenient replacement for both the Websocket API and the higher-level libraries and services relying on it.
@@ -58,10 +58,13 @@ mercure:
 ```
 It is very important to set properly the `CORS_ALLOWED_ORIGINS` attribute, otherwise the clients won't be able to send their authorization cookie to the Mercure hub.
 
-If you've created a Symfony App, install the Symfony Component which implements Mercure :
-``composer require mercure``
+Don't forget to run your containers :
+`docker-compose up -d`
 
-Then, you need to generate a JWT token that your application must bear to be able to *publish* updates to the Mercure Hub. Go to [jwt.io](https://jwt.io/#debugger-io?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.rQB2YPCYz8NX2V1k_a9G3E_AQ6i_1JidlOrOEhUtJaw). The payload should at least contain the following structure :  
+If you've created a Symfony App, install the Symfony Component which implements Mercure :
+`composer require mercure`
+
+Then, you need to generate a JWT token that your application must bear to be able to *publish* updates to the Mercure Hub. Go to [jwt.io](https://jwt.io/#debugger-io?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.rQB2YPCYz8NX2V1k_a9G3E_AQ6i_1JidlOrOEhUtJaw). The payload should at least contain the following structure :
 ```json
 {
   "mercure": {
@@ -127,15 +130,15 @@ class PizzaController extends AbstractController
     public function update(PublisherInterface $publisher): RedirectResponse
         {
             $pizza = $this->pizzaRepository->findById(2);
-            $pizza->setName("A new name");
-      
+            $pizza->name = "A new name";
+
             $update = new Update(
                 ['http://localhost/api/pizzas/2'],
                 json_encode($pizza)
             );
-            
+
             $publisher($update);
-    
+
             return $this->redirectToRoute('home');
         }
 }
@@ -154,7 +157,7 @@ As said just before, Symfony just made an HTTP POST request to the hub of Mercur
 // MyClass.php
 
 use GuzzleHttp\Client;
-// ... 
+// ...
 
 public function create(): void
 {
@@ -189,7 +192,7 @@ subscribe() {
 }
 ```
 
-Actually, when you'll implement it on your project, you will do things a little differently. Indeed, the [specification](https://mercure.rocks/spec) of Mercure indicates that the hub URL should be discoverable, which implies that on the client side, the hub URL should be discovered rather than hard-coded. Thus, you'll have to set a `Link` header with the hub URL (`<http://localhost:3000/.well-known/mercure>; rel="mercure"`) in the response of a GET request when a resource is fetched. If you use API Platform, you don't have to do anything on your app, it sends the header for you.  
+Actually, when you'll implement it on your project, you will do things a little differently. Indeed, the [specification](https://mercure.rocks/spec) of Mercure indicates that the hub URL should be discoverable, which implies that on the client side, the hub URL should be discovered rather than hard-coded. Thus, you'll have to set a `Link` header with the hub URL (`<http://localhost:3000/.well-known/mercure>; rel="mercure"`) in the response of a GET request when a resource is fetched. If you use API Platform, you don't have to do anything on your app, it sends the header for you.
 NB : At the moment, I cannot find a way to use the autodiscovery mechanism with API Platform when Mercure is installed with docker, because API Platform uses the hub url written in the `.env` file and not the actual one. Thus, the hub url is hard-coded in the demo project.
 
 ```javascript
@@ -226,7 +229,7 @@ A few more things to know :
   const domain = 'document.location.origin';
   url.searchParams.append('topic', `${domain}/api/pizzas/{id}`);
   url.searchParams.append('topic', `${domain}/api/users/{id}`);
-  
+
   const es = new EventSource(url.toString(), {withCredentials: true});
   ```
 ### Send private updates in Mercure (from 0.10 version of Mercure)
@@ -245,7 +248,7 @@ $update = new Update(
         json_encode($pizza),
         true
     );
-    
+
     $publisher($update);
 }
 ```
@@ -253,7 +256,7 @@ $update = new Update(
 Only those who have subscribed to the topic `http://localhost/api/pizzas/2` (or `http://localhost/api/pizzas/{id}`) or to the topic `http://localhost/api/food` (or to both topics) will receive this update.
 
 #### Subscribe to topics of a private update
-If the client bears not JWT to the hub of Mercure, it will only receive *public* updates. For them to receive *private* updates, they have to bear a JWT, whose payload is structured like this :
+If the client bears no JWT to the hub of Mercure, it will only receive *public* updates. For them to receive *private* updates, they have to bear a JWT, whose payload is structured like this :
 ```json
 {
   "mercure": {
@@ -323,7 +326,7 @@ To publish to a certain target, you just have to add an array of targets URI as 
 
 ```php
 // App/Controller/PizzaController.php
- 
+
 public function create(PublisherInterface $publisher)
 {
     $pizza = json_encode(new Pizza('Quatre fromages'));

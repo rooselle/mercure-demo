@@ -163,12 +163,8 @@
                 es.onmessage = ({data}) => {
                     const responsePizza = JSON.parse(data);
 
-                    if (!responsePizza.id) {
+                    if (null !== responsePizza.deletedAt) {
                         this.deletePizza(responsePizza['@id'], this.pizzas);
-                        const pizzaInUserList = this.user.pizzas.findIndex(p => p['@id'] === responsePizza['@id']);
-                        if (pizzaInUserList >= 0) {
-                            this.user.pizzas.splice(pizzaInUserList, 1);
-                        }
                         return;
                     }
 
