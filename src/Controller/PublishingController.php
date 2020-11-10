@@ -136,6 +136,9 @@ class PublishingController extends AbstractController
         return $this->redirectToRoute(static::ROUTE_PUBLISHING);
     }
 
+    /**
+     * @param array<string> $topics
+     */
     private function sendNotification(array $topics, string $data, bool $private = false): void
     {
         $update = new Update(

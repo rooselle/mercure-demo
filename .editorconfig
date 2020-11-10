@@ -1,0 +1,30 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 120
+
+[*.{php,html,twig}]
+indent_size = 4
+
+[*.{css, scss, sass}]
+indent_size = 2
+
+[*.vue]
+indent_size = 2
+
+[{*.bash,*.sh,*.zsh}]
+indent_size = 2
+
+[{*.cjs,*.js,*.ts}]
+indent_size = 2
+
+[{*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.stylelintrc,bowerrc,composer.lock,jest.config}]
+indent_size = 2
+
+[{*.yaml,*.yml,*.neon}]
+indent_size = 4
