@@ -79,9 +79,6 @@ class SubscribingController extends AbstractController
         return $this->render(static::INDEX_TEMPLATE, [static::PERSON_VARIABLE_NAME => 'Admin 2'], $response);
     }
 
-    /**
-     * @return Response
-     */
     private function getResponse(string $token): Response
     {
         $response = new Response();

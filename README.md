@@ -58,8 +58,11 @@ mercure:
 ```
 It is very important to set properly the `CORS_ALLOWED_ORIGINS` attribute, otherwise the clients won't be able to send their authorization cookie to the Mercure hub.
 
+Don't forget to run your containers :
+`docker-compose up -d`
+
 If you've created a Symfony App, install the Symfony Component which implements Mercure :
-``composer require mercure``
+`composer require mercure`
 
 Then, you need to generate a JWT token that your application must bear to be able to *publish* updates to the Mercure Hub. Go to [jwt.io](https://jwt.io/#debugger-io?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.rQB2YPCYz8NX2V1k_a9G3E_AQ6i_1JidlOrOEhUtJaw). The payload should at least contain the following structure :  
 ```json
@@ -127,7 +130,7 @@ class PizzaController extends AbstractController
     public function update(PublisherInterface $publisher): RedirectResponse
         {
             $pizza = $this->pizzaRepository->findById(2);
-            $pizza->setName("A new name");
+            $pizza->name = "A new name";
       
             $update = new Update(
                 ['http://localhost/api/pizzas/2'],
@@ -253,7 +256,7 @@ $update = new Update(
 Only those who have subscribed to the topic `http://localhost/api/pizzas/2` (or `http://localhost/api/pizzas/{id}`) or to the topic `http://localhost/api/food` (or to both topics) will receive this update.
 
 #### Subscribe to topics of a private update
-If the client bears not JWT to the hub of Mercure, it will only receive *public* updates. For them to receive *private* updates, they have to bear a JWT, whose payload is structured like this :
+If the client bears no JWT to the hub of Mercure, it will only receive *public* updates. For them to receive *private* updates, they have to bear a JWT, whose payload is structured like this :
 ```json
 {
   "mercure": {

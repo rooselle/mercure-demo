@@ -8,6 +8,13 @@ NPM                   = $(EXEC_PHP_CONTAINER) npm
 SYMFONY               = $(EXEC_PHP_CONTAINER) bin/console
 
 ##
+## Container
+## ----
+##
+php:
+	$(EXEC_PHP_CONTAINER) $(filter-out $@,$(MAKECMDGOALS))
+
+##
 ## Environment
 ## -----------
 ##
