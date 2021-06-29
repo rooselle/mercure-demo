@@ -73,15 +73,26 @@ assets-prod: ## Build the production version of the assets
 ## -------
 ##
 
-cs-fixer: php-cs-fixer ## Apply php-cs-fixer
+cs-fixer: ## Apply php-cs-fixer
 	$(ECHO) "Running php-cs-fixer"
-	$(EXEC_PHP_CONTAINER) php php-cs-fixer fix --config=.php_cs.dist -v --using-cache=no
+	$(EXEC_PHP_CONTAINER) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php -v --using-cache=no
 
 phpstan: ## Run phpstan
 	$(ECHO) "Running phpstan"
 	$(EXEC_PHP_CONTAINER) vendor/bin/phpstan analyse
 
 quality: cs-fixer phpstan ## Shortcut for make php-cs-fixer and make phpstan
+
+phpunit: ## Run unit tests
+	$(ECHO) "Running tests"
+	$(EXEC_PHP_CONTAINER) bin/phpunit
+
+phpunit-report: ## Run unit tests and generate code coverage report in HTML
+	$(ECHO) "Running tests and generating code coverage report"
+	$(EXEC_PHP_CONTAINER) bin/phpunit --coverage-html tests/report
+
+composer-unused: ## Run composer-unused to check for unused packages
+	$(EXEC_PHP_CONTAINER) php composer-unused.phar
 
 ##
 ## Debug
@@ -110,6 +121,10 @@ composer-install:
 	$(ECHO) "Installing Symfony vendors"
 	$(EXEC_PHP_CONTAINER) composer install
 
+download-composer-unused:
+	$(ECHO) "Downloading composer-unused"
+	$(EXEC_PHP_CONTAINER) curl -JOL https://github.com/icanhazstring/composer-unused/releases/latest/download/composer-unused.phar
+
 docker-build:
 	$(ECHO) "Building docker"
 	$(DOCKER_COMPOSE) build --pull
@@ -118,10 +133,6 @@ docker-kill:
 	$(ECHO) "Killing docker"
 	$(DOCKER_COMPOSE) kill
 	$(DOCKER_COMPOSE) down --volumes --remove-orphans
-
-php-cs-fixer:
-	$(ECHO) "Downloading php-cs-fixer"
-	$(EXEC_PHP_CONTAINER) curl -L http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
 
 wait-for-db:
 	$(ECHO) "Waiting for db"
