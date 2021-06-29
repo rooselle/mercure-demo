@@ -37,7 +37,7 @@ services:
             - db
 
     mercure:
-        image: dunglas/mercure:v0.10
+        image: dunglas/mercure:latest
         container_name: mercure
         environment:
             ALLOW_ANONYMOUS: 1
