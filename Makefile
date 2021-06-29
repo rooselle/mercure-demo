@@ -83,6 +83,14 @@ phpstan: ## Run phpstan
 
 quality: cs-fixer phpstan ## Shortcut for make php-cs-fixer and make phpstan
 
+phpunit: ## Run unit tests
+	$(ECHO) "Running tests"
+	$(EXEC_PHP_CONTAINER) bin/phpunit
+
+phpunit-report: ## Run unit tests and generate code coverage report in HTML
+	$(ECHO) "Running tests and generating code coverage report"
+	$(EXEC_PHP_CONTAINER) bin/phpunit --coverage-html tests/report
+
 composer-unused: ## Run composer-unused to check for unused packages
 	$(EXEC_PHP_CONTAINER) php composer-unused.phar
 

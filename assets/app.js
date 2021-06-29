@@ -1,10 +1,10 @@
-import Vue            from 'vue';
-import App            from './view/App.vue';
-import BootstrapVue   from 'bootstrap-vue';
-import Notifications  from 'vue-notification';
-import VueTimeago     from 'vue-timeago';
+import './styles/app.css';
+import Vue from 'vue';
+import App from './js/view/App.vue';
+import BootstrapVue from 'bootstrap-vue';
+import Notifications from 'vue-notification';
+import VueTimeago from 'vue-timeago';
 
-import '../css/app.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
